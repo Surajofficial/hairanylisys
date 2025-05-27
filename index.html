@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hair Analysis Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step {
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+        }
+
+        .active-step {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+        }
+
+        .slide-left {
+            transform: translateX(-100%);
+        }
+
+        .slide-right {
+            transform: translateX(100%);
+        }
+
+        .step-btn,
+        .back-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin: 8px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .step-btn:hover,
+        .back-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input:focus {
+            border-color: #3b82f6;
+        }
+
+        #progressBar {
+            transition: width 0.4s ease;
+        }
+
+        .stage-btn {
+            height: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .stageImg {
+            object-fit: contain;
+            height: inherit;
+            mix-blend-mode: multiply;
+            margin: 0;
+        }
+
+        .image {
+            font-size: 10px;
+            margin: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 10px;
+            height: 110px;
+            cursor: pointer;
+        }
+
+        .upload {
+            height: 40px;
+            padding: 0px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex justify-center items-center min-h-screen">
+        <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-8 relative overflow-hidden">
+            <div class="text-center mb-4">
+                <div class="flex justify-around items-center space-x-4">
+                    <button type="button" id="backBtn" class="back-btn w-[40px]" onclick="prevStep()">&lt;</button>
+                    <h2 class="text-3xl font-bold text-blue-600">Hair Analysis Form</h2>
+                </div>
+                <div id="progressBar" class="mt-2 h-2 bg-blue-600 rounded-full" style="width: 3%"></div>
+            </div>
+
+            <form id="hairForm" class="relative" enctype="multipart/form-data" onsubmit="return validateForm(event)">
+                <!-- Step 1: Gender -->
+                <div class="step active-step">
+                    <h3 class="text-2xl font-semibold mb-4">Choose Your Gender</h3>
+                    <div class="space-y-2">
+                        <button type="button" class="step-btn" onclick="selectGender('male')">Male</button>
+                        <button type="button" class="step-btn" onclick="selectGender('female')">Female</button>
+                    </div>
+                    <input type="hidden" name="gender" id="genderInput" />
+                </div>
+
+                <!-- Step 2: Hair Loss Description -->
+                <div class="step slide-right">
+                    <h3 class="text-2xl font-semibold mb-4" id="hair_loss_description_title"></h3>
+                    <div id="hairLossOptions" class="space-y-2"></div>
+                    <input type="hidden" name="hair_loss_description" id="hairLossInput" />
+                </div>
+
+                <!-- Step 3: Hair Loss Duration -->
+                <div class="step slide-right">
+                    <h3 class="text-2xl font-semibold mb-4">How long have you been experiencing hair loss?</h3>
+                    <div class="space-y-2">
+                        <button type="button" class="step-btn"
+                            onclick="nextStep('Less than 1 year', 'hairLossPeriod')">&lt; 1 Year</button>
+                        <button type="button" class="step-btn" onclick="nextStep('1-2 years', 'hairLossPeriod')">1-2
+                            Year</button>
+                        <button type="button" class="step-btn" onclick="nextStep('3-5 years', 'hairLossPeriod')">3-5
+                            Year</button>
+                        <button type="button" class="step-btn"
+                            onclick="nextStep('More than 5 years', 'hairLossPeriod')">&gt; 5 Year</button>
+                    </div>
+                    <input type="hidden" name="hair_los_period" id="hairLossPeriod" />
+                </div>
+
+                <!-- Step 4: Treatment History -->
+                <div class="step slide-right">
+                    <h3 class="text-2xl font-semibold mb-4">Have you had a hair transplant/PRP before?</h3>
+                    <div class="space-y-2">
+                        <button type="button" class="step-btn" onclick="nextStep('Yes', 'takeTratment')">Yes</button>
+                        <button type="button" class="step-btn" onclick="nextStep('No', 'takeTratment')">No</button>
+                    </div>
+                    <input type="hidden" name="take_treatment" id="takeTratment" />
+                </div>
+
+                <!-- Step 5: Treatment Timeline -->
+                <div class="step slide-right">
+                    <h3 class="text-2xl font-semibold mb-4">When would you like your treatment?</h3>
+                    <div class="space-y-2">
+                        <button type="button" class="step-btn"
+                            onclick="nextStep('As soon as possible', 'whenTakeTreatment')">As soon as possible</button>
+                        <button type="button" class="step-btn" onclick="nextStep('In 6 months', 'whenTakeTreatment')">In
+                            next 6 months</button>
+                        <button type="button" class="step-btn" onclick="nextStep('In 1 year', 'whenTakeTreatment')">In
+                            next 1 year</button>
+                        <button type="button" class="step-btn"
+                            onclick="nextStep('I only want information', 'whenTakeTreatment')">I only want
+                            information</button>
+                    </div>
+                    <input type="hidden" name="when_take_treatment" id="whenTakeTreatment" />
+                </div>
+
+                <!-- Step 6: Contact Info -->
+                <div class="step slide-right">
+                    <h3 class="text-2xl font-semibold mb-4">Your Contact Details</h3>
+                    <input type="text" name="name" id="name" placeholder="Full Name" class="input" required />
+                    <input type="email" name="email" id="email" placeholder="Email" class="input" required />
+                    <input type="text" name="phone" id="phone" placeholder="Phone" class="input" required />
+                    <button type="submit" class="step-btn">Submit</button>
+                </div>
+
+                <!-- Step 7: Image Upload -->
+                <div class="step slide-right">
+                    <h3 class="text-2xl font-bold text-center text-blue-600 mb-4" id="imageUploadTitle">Upload Hair
+                        Images</h3>
+                    <div class="flex flex-wrap justify-around mb-4">
+                        <label class="image" for="front">
+                            <img src="./stage/schwarz-5.svg" alt="Front" class="w-10 h-10" />
+                            <span>Front</span>
+                            <img src="./stage/uploadicon.png" class="upload" alt="Upload Icon" />
+                            <input type="file" id="front" class="hidden" onchange="validateImage(this)" />
+                        </label>
+                        <label class="image" for="back">
+                            <img src="./stage/w_hinten.svg" alt="Back" class="w-10 h-10" />
+                            <span>Back</span>
+                            <img src="./stage/uploadicon.png" class="upload" alt="Upload Icon" />
+                            <input type="file" id="back" class="hidden" onchange="validateImage(this)" />
+                        </label>
+                        <label class="image" for="top">
+                            <img src="./stage/w_oben.svg" alt="Top" class="w-10 h-10" />
+                            <span>Top</span>
+                            <img src="./stage/uploadicon.png" class="upload" alt="Upload Icon" />
+                            <input type="file" id="top" class="hidden" onchange="validateImage(this)" />
+                        </label>
+                    </div>
+                    <div class="flex justify-center">
+                        <button type="button" class="step-btn w-1/2" onclick="submitImages()">Upload Now</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const steps = document.querySelectorAll(".step");
+        const APIURL = "http://127.0.0.1:8000/api";
+        let currentStep = 0;
+        const backBtn = document.querySelector("#backBtn");
+
+        function showStep(stepIndex) {
+            backBtn.style.display = stepIndex > 0 && stepIndex < steps.length - 1 ? "block" : "none";
+            steps.forEach((step, index) => {
+                step.classList.remove("active-step", "slide-left", "slide-right");
+                if (index === stepIndex) step.classList.add("active-step");
+                else if (index < stepIndex) step.classList.add("slide-left");
+                else step.classList.add("slide-right");
+            });
+            document.getElementById("progressBar").style.width = `${(stepIndex / (steps.length - 1)) * 100}%`;
+        }
+
+        function nextStep(value, inputId) {
+            if (inputId) document.getElementById(inputId).value = value;
+            if (currentStep < steps.length - 1) currentStep++;
+            showStep(currentStep);
+        }
+
+        function prevStep() {
+            if (currentStep > 0) currentStep--;
+            showStep(currentStep);
+        }
+
+        function selectGender(gender) {
+            document.getElementById("genderInput").value = gender;
+            const title = gender === "male" ? "Select Norwood Stage" : "Select Ludwig Stage";
+            document.getElementById("hair_loss_description_title").textContent = title;
+
+            const hairLossOptions = document.getElementById("hairLossOptions");
+            hairLossOptions.innerHTML = "";
+
+            const stages = gender === "male" ? [1, 2, 3, 4, 5, 6, 7] : [1, 2, 3];
+            stages.forEach(stage => {
+                hairLossOptions.innerHTML += `
+          <button type="button" class="step-btn stage-btn" onclick="nextStep('${stage}', 'hairLossInput')">
+            <span>Stage ${stage}</span> 
+            <img src='./stage/stage${stage}${gender}.png' class='stageImg' alt='Stage ${stage}' />
+          </button>`;
+            });
+            nextStep(gender, "genderInput");
+        }
+
+        function validateForm(e) {
+            e.preventDefault();
+            submitForm();
+        }
+
+        async function submitForm() {
+            const formData = new FormData(document.getElementById("hairForm"));
+            const response = await fetch(APIURL + "/hair-analysis", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+            const name = result?.data?.name || "";
+            const gender = result?.data?.gender || "Mr";
+            document.getElementById("imageUploadTitle").textContent = `Welcome ${gender === "male" ? "Mr." : "Ms."} ${name}, Upload Hair Images`;
+            currentStep++;
+            showStep(currentStep);
+        }
+
+        function validateImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if (!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(file.type)) {
+                alert("Upload only JPG, PNG, GIF, or WEBP images.");
+                input.value = "";
+                return false;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File too big! Upload under 2MB.");
+                input.value = "";
+                return false;
+            }
+            const reader = new FileReader();
+            reader.onload = e => input.previousElementSibling.src = e.target.result;
+            reader.readAsDataURL(file);
+        }
+
+        async function submitImages() {
+            const front = document.getElementById("front").files[0];
+            const back = document.getElementById("back").files[0];
+            const top = document.getElementById("top").files[0];
+            if (!front || !back || !top) return alert("Upload all 3 images!");
+
+            const formData = new FormData();
+            formData.append("front", front);
+            formData.append("back", back);
+            formData.append("top", top);
+            formData.append("phone", document.getElementById("phone").value);
+
+            await fetch(APIURL + "/upload-images", { method: "POST", body: formData });
+            window.location.href = 'thank-you.html';
+        }
+
+        showStep(currentStep);
+    </script>
+</body>
+
+</html>
