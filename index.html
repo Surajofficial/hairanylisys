@@ -308,8 +308,25 @@
             formData.append("top", top);
             formData.append("phone", document.getElementById("phone").value);
 
-            await fetch(APIURL + "/upload-images", { method: "POST", body: formData });
-            window.location.href = 'thank-you.html';
+            try {
+                const response = await fetch(APIURL + "/upload-images", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error("Upload failed. Please try again.");
+                }
+
+                const result = await response.json();
+
+                // Optionally log or use result
+                console.log("Upload successful:", result);
+                window.location.href = "thank-you.html";
+            } catch (error) {
+                console.error("Image upload error:", error);
+                alert("Failed to upload images. Please try again.");
+            }
         }
 
         showStep(currentStep);
