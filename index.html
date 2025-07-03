@@ -79,6 +79,13 @@
             margin: 0;
         }
 
+        .male {
+            object-fit: contain;
+            height: inherit;
+            mix-blend-mode: multiply;
+            margin: 0;
+        }
+
         .image {
             font-size: 10px;
             margin: 2px;
@@ -252,7 +259,7 @@
                 hairLossOptions.innerHTML += `
           <button type="button" class="step-btn stage-btn" onclick="nextStep('${stage}', 'hairLossInput')">
             <span>Stage ${stage}</span> 
-            <img src='./stage/stage${stage}${gender}.png' class='stageImg' alt='Stage ${stage}' />
+            <img src='./stage/stage${stage}${gender}.png' class='stageImg ${gender}' alt='Stage ${stage}' />
           </button>`;
             });
             nextStep(gender, "genderInput");
